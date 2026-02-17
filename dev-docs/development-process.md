@@ -25,7 +25,7 @@ easier on the reviewer. It may not always be possible to break up a feature into
 Before you can write code, there are some setup steps that will allow you to
 develop effectively.
 
-Hail currently supports Python version 3.9 or greater.
+Hail currently supports Python version 3.10 or greater.
 
 Install the python dependencies of every Hail sub-project (e.g. ci, batch, hail/python/hailtop):
 
