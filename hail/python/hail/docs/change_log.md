@@ -56,10 +56,10 @@ critically depend on experimental functionality.**
 
 ### Deprecations
 
-- Hail now supports and primarily tests against PySpark 4.1.0 and Python 3.10+.
-  The minimum required Python version has been updated from 3.9 to 3.10, as 
-  required by PySpark 4.1.0. We strongly recommend updating to Python 3.10 or 
-  later and PySpark 4.1.0.
+- Hail now supports and primarily tests against PySpark 4.1.0, Python 3.10+, and Java 17.
+  The minimum required Python version has been updated from 3.9 to 3.10, and the minimum
+  required Java version has been updated from 11 to 17, as required by PySpark 4.1.0. 
+  We strongly recommend updating to Python 3.10 or later, Java 17 or later, and PySpark 4.1.0.
 
 ## Version 0.2.133
 

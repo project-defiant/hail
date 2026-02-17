@@ -81,10 +81,10 @@ object HailContext {
       /* see:
        * https://docs.oracle.com/javase/9/migrate/toc.htm#JSMIG-GUID-3A71ECEF-5FC5-46FE-9BA9-88CBFCE828CB */
       case javaVersion("1", _, _) =>
-        warn(s"Hail is tested against Java 11, found Java $versionString")
+        warn(s"Hail is tested against Java 17, found Java $versionString")
       case javaVersion(major, _, _) =>
-        if (major.toInt != 11)
-          warn(s"Hail is tested against Java 11, found $versionString")
+        if (major.toInt != 17)
+          warn(s"Hail is tested against Java 17, found $versionString")
       case _ =>
         fatal(s"Unknown JVM version string: $versionString")
     }

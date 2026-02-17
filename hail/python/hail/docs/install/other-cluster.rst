@@ -10,7 +10,7 @@ Hail should work with any Spark 4.1.x cluster built with Scala 2.12.
 Hail needs to be built from source on the leader node. Building Hail from source
 requires:
 
-- Java 11 JDK.
+- Java 17 JDK.
 - Python 3.10 or later.
 - A recent C and a C++ compiler, GCC 5.0, LLVM 3.4, or later versions of either
   suffice.
@@ -23,7 +23,7 @@ On a Debian-like system, the following should suffice:
 
    apt-get update
    apt-get install \
-       openjdk-11-jdk-headless \
+       openjdk-17-jdk-headless \
        g++ \
        python3 python3-pip \
        libopenblas-dev liblapack-dev \
