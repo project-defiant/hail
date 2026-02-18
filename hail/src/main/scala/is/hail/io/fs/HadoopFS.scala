@@ -130,7 +130,7 @@ class HadoopFS(private[this] var conf: SerializableHadoopConfiguration) extends 
     if (statuses == null) {
       throw new FileNotFoundException(url.toString)
     } else {
-      statuses.par.map(_.getPath)
+      statuses.map(_.getPath)
         .flatMap(url.hadoopFs.listStatus(_))
         .map(new HadoopFileListEntry(_))
         .toArray

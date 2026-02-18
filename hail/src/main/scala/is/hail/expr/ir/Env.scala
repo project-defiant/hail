@@ -274,7 +274,7 @@ final class Env[V] private (val m: Map[Env.K, V]) {
   def bindIterable(bindings: Iterable[(Name, V)]): Env[V] =
     if (bindings.isEmpty) this else new Env(m ++ bindings)
 
-  def mapValues[U](f: (V) => U): Env[U] = new Env(m.mapValues(f))
+  def mapValues[U](f: (V) => U): Env[U] = new Env(m.view.mapValues(f).toMap)
 
   def mapValuesWithKey[U](f: (Env.K, V) => U): Env[U] =
     new Env(m.map { case (k, v) => (k, f(k, v)) })

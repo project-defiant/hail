@@ -137,7 +137,7 @@ class RichDenseMatrixDouble(val m: BDM[Double]) extends AnyVal {
     val nParts = gp.numPartitions
     val d = digitsNeeded(nParts)
 
-    val partFiles = (0 until nParts).par.map { pi =>
+    val partFiles = (0 until nParts).map { pi =>
       val f = partFile(d, pi)
       val filename = path + "/parts/" + f
 

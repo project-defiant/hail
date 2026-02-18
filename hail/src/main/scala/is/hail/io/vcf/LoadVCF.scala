@@ -77,9 +77,9 @@ object VCFHeaderInfo {
     val formatFields = lookupFields("formatFields")
 
     def lookupAttrs(name: String) = (jv \ name).asInstanceOf[JObject].obj.toMap
-      .mapValues { case elt: JObject =>
-        elt.obj.toMap.mapValues(_.asInstanceOf[JString].s)
-      }
+      .view.mapValues { case elt: JObject =>
+        elt.obj.toMap.view.mapValues(_.asInstanceOf[JString].s).toMap
+      }.toMap
 
     val filterAttrs = lookupAttrs("filterAttrs")
     val infoAttrs = lookupAttrs("infoAttrs")

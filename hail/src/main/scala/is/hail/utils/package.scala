@@ -5,11 +5,9 @@ import is.hail.check.Gen
 import is.hail.expr.ir.ByteArrayBuilder
 import is.hail.io.fs.{FS, FileListEntry}
 
-import scala.collection.{mutable, GenTraversableOnce, TraversableOnce}
-import scala.collection.generic.CanBuildFrom
+import scala.collection.{mutable, IterableOnce, Factory}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionException
-import scala.language.higherKinds
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
@@ -59,9 +57,8 @@ package utils {
   }
 
   sealed trait AnyFailAllFail[C[_]] {
-    def apply[T](ts: TraversableOnce[Option[T]])(implicit cbf: CanBuildFrom[Nothing, T, C[T]])
-      : Option[C[T]] = {
-      val b = cbf()
+    def apply[T](ts: IterableOnce[Option[T]])(implicit factory: Factory[T, C[T]]): Option[C[T]] = {
+      val b = factory.newBuilder
       for (t <- ts)
         if (t.isEmpty)
           return None
@@ -79,9 +76,9 @@ package utils {
       f: (T, S) => (U, S)
     )(implicit
       uct: ClassTag[U],
-      cbf: CanBuildFrom[Nothing, U, C[U]],
+      factory: Factory[U, C[U]],
     ): C[U] = {
-      val b = cbf()
+      val b = factory.newBuilder
       var acc = z
       for ((x, i) <- a.zipWithIndex) {
         val (y, newAcc) = f(x, acc)
@@ -170,7 +167,7 @@ package object utils
 
   val noOp: () => Unit = () => ()
 
-  def square[T](d: T)(implicit ev: T => scala.math.Numeric[T]#Ops): T = d * d
+  def square[T](d: T)(implicit num: Numeric[T]): T = num.times(d, d)
 
   def triangle(n: Int): Int = (n * (n + 1)) / 2
 
@@ -395,7 +392,7 @@ package object utils
     * @tparam B
     */
   def coalesce[A, B: ClassTag](
-    xs: GenTraversableOnce[A]
+    xs: IterableOnce[A]
   )(
     size: Int,
     key: (A, Int) => Int,
@@ -414,7 +411,7 @@ package object utils
   }
 
   def mapSameElements[K, V](l: Map[K, V], r: Map[K, V], valueEq: (V, V) => Boolean): Boolean = {
-    def entryMismatchMessage(failures: TraversableOnce[(K, V, V)]): String = {
+    def entryMismatchMessage(failures: IterableOnce[(K, V, V)]): String = {
       require(failures.nonEmpty)
       val newline = System.lineSeparator()
       val sb = new StringBuilder
@@ -778,20 +775,20 @@ package object utils
     else
       right
 
-  def makeJavaMap[K, V](x: TraversableOnce[(K, V)]): java.util.HashMap[K, V] = {
+  def makeJavaMap[K, V](x: IterableOnce[(K, V)]): java.util.HashMap[K, V] = {
     val m = new java.util.HashMap[K, V]
     x.foreach { case (k, v) => m.put(k, v) }
     m
   }
 
-  def makeJavaSet[K](x: TraversableOnce[K]): java.util.HashSet[K] = {
+  def makeJavaSet[K](x: IterableOnce[K]): java.util.HashSet[K] = {
     val m = new java.util.HashSet[K]
     x.foreach(m.add)
     m
   }
 
   def toMapFast[T, K, V](
-    ts: TraversableOnce[T]
+    ts: IterableOnce[T]
   )(
     key: T => K,
     value: T => V,
@@ -1015,7 +1012,7 @@ package object utils
         for (k <- j until m)
           res += ys(k)
 
-        res
+        res.toIndexedSeq
     }
 
   /** Run tasks on the `executor`, returning some `F` of the failures and an `IndexedSeq` of the
@@ -1046,7 +1043,7 @@ package object utils
       }
     }
 
-    (err, buffer.sortBy(_._2))
+    (err, buffer.sortBy(_._2).toIndexedSeq)
   }
 
   def runAllKeepFirstError[A](executor: ExecutorService)

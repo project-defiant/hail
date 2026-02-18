@@ -11,6 +11,7 @@ import is.hail.utils.prettyPrint._
 import is.hail.utils.richUtils.RichIterable
 
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 import org.json4s.DefaultFormats
 import org.json4s.jackson.{JsonMethods, Serialization}
@@ -168,10 +169,11 @@ class Pretty(
         fillList(state.n match {
           case None => text(Pretty.prettyClass(state)) +: state.t.view.map(typ =>
               text(typ.canonicalPType.toString)
-            )
-          case Some(nested) => text(Pretty.prettyClass(state)) +: state.t.view.map(typ =>
+            ).toSeq
+          case Some(nested) =>
+            (text(Pretty.prettyClass(state)) +: state.t.view.map(typ =>
               text(typ.canonicalPType.toString)
-            ) :+ prettyAggStateSignatures(nested)
+            ).toSeq) :+ prettyAggStateSignatures(nested)
         })
     }
   }
@@ -945,7 +947,7 @@ class Pretty(
         val (bodyPre, bodyHead) = pretty(body, bindings.bind(name, valueIdent))
         (concat(valueDoc, bodyPre), bodyHead)
       case _ =>
-        val strictChildBodies = mutable.ArrayBuilder.make[Doc]()
+        val strictChildBodies = mutable.ArrayBuilder.make[Doc](ClassTag(classOf[Doc]))
         val strictChildIdents = for {
           (child, i) <- ir.children.zipWithIndex
           if childIsStrict(ir, i)

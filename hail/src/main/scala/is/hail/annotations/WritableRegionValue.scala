@@ -105,7 +105,7 @@ class RegionValuePriorityQueue(
 
   override def nonEmpty: Boolean = queue.nonEmpty
 
-  def empty: Boolean = queue.nonEmpty
+  override def isEmpty: Boolean = queue.isEmpty
 
   override def head: RegionValue = queue.head
 
@@ -140,7 +140,9 @@ class RegionValueArrayBuffer(val t: PType, region: Region, sm: HailStateManager)
 
   def length = idx.length
 
-  def +=(rv: RegionValue): this.type =
+  override def knownSize: Int = idx.length
+
+  def addOne(rv: RegionValue): this.type =
     this.append(rv.region, rv.offset)
 
   def append(fromRegion: Region, fromOffset: Long): this.type = {

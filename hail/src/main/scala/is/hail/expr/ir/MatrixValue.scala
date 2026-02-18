@@ -128,7 +128,7 @@ case class MatrixValue(
       path + "/rows",
       globals.t,
       bufferSpec,
-      Array(globals.javaValue),
+      Array[Any](globals.javaValue),
     )
     val partitionCounts = fileData.map(_.rowsWritten)
 

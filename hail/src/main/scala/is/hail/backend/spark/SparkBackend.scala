@@ -465,7 +465,7 @@ class SparkBackend(
       case NonFatal(t) => failure = failure.orElse(Some(t))
     }
 
-    (failure, buffer.sortBy(_._2))
+    (failure, buffer.sortBy(_._2).toIndexedSeq)
   }
 
   def defaultParallelism: Int = sc.defaultParallelism

@@ -118,7 +118,7 @@ class EmitCodeBuilder(val emb: EmitMethodBuilder[_], var code: Code[Unit]) exten
     s.store(this, v)
 
   def assign(is: IndexedSeq[EmitSettable], ix: IndexedSeq[EmitCode]): Unit =
-    (is, ix).zipped.foreach((s, c) => s.store(this, c))
+    is.lazyZip(ix).foreach((s, c) => s.store(this, c))
 
   def memoizeField(pc: SValue, name: String): SValue = {
     val f = emb.newPField(name, pc.st)

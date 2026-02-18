@@ -37,7 +37,7 @@ class OriginUnionRDD[T: ClassTag, S: ClassTag](
       deps += new RangeDependency(rdd, 0, i, rdd.partitions.length)
       i += rdd.partitions.length
     }
-    deps
+    deps.toSeq
   }
 
   override def compute(s: Partition, tc: TaskContext): Iterator[S] = {

@@ -123,11 +123,11 @@ object AbstractRVDSpec {
         val leftParts = specLeft.absolutePartPaths(pathLeft)
         val rightParts = specRight.absolutePartPaths(pathRight)
         assert(leftParts.length == rightParts.length)
-        val contextsValue: IndexedSeq[Any] = (leftParts, rightParts, leftParts.indices)
-          .zipped
-          .map { (path1, path2, partIdx) =>
-            Row(Row(partIdx.toLong, path1), Row(partIdx.toLong, path2))
-          }
+        val contextsValue: IndexedSeq[Any] =
+          leftParts.lazyZip(rightParts).lazyZip(leftParts.indices)
+            .map { (path1, path2, partIdx) =>
+              Row(Row(partIdx.toLong, path1), Row(partIdx.toLong, path2))
+            }.toIndexedSeq
 
         val ctxIR = ToStream(Literal(TArray(reader.contextType), contextsValue))
 

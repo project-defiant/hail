@@ -1449,8 +1449,7 @@ object RVD {
 
     execCtx.timer.time("writeMetadataInParallel")(
       fileData.zipWithIndex
-        .par
-        .foreach { case (partFiles, i) =>
+        .foreach { case (partFiles: Array[FileWriteMetadata], i: Int) =>
           val fs = fsBc.value
           val basePath = paths(i)
           RichContextRDDRegionValue.writeSplitSpecs(

@@ -242,7 +242,7 @@ pyjwt==2.9.0
     # via
     #   -c hail/python/hailtop/pinned-requirements.txt
     #   msal
-pyspark==4.1.0
+pyspark==4.1.1
     # via
     #   -c hail/python/dataproc-pre-installed-requirements.txt
     #   -r hail/python/requirements.txt

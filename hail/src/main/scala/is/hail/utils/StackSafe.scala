@@ -1,7 +1,8 @@
 package is.hail.utils
 
 import scala.annotation.tailrec
-import scala.collection.generic.{CanBuild, CanBuildFrom}
+import scala.collection.Factory
+import scala.reflect.ClassTag
 
 object StackSafe {
 
@@ -84,13 +85,12 @@ object StackSafe {
   }
 
   implicit class RichIndexedSeq[A](private val s: IndexedSeq[A]) extends AnyVal {
-    def mapRecur[B, That](f: A => StackFrame[B])(implicit bf: CanBuildFrom[IndexedSeq[A], B, That])
-      : StackFrame[That] = {
-      val builder = bf(s)
+    def mapRecur[B](f: A => StackFrame[B]): StackFrame[IndexedSeq[B]] = {
+      val builder = IndexedSeq.newBuilder[B]
       builder.sizeHint(s)
       var i = 0
-      var cont: B => StackFrame[That] = null
-      def loop(): StackFrame[That] =
+      var cont: B => StackFrame[IndexedSeq[B]] = null
+      def loop(): StackFrame[IndexedSeq[B]] =
         if (i < s.size) {
           f(s(i)).flatMap(cont)
         } else {
@@ -105,10 +105,9 @@ object StackSafe {
     }
   }
 
-  implicit class RichArray[A](private val a: Array[A]) extends AnyVal {
-    def mapRecur[B](f: A => StackFrame[B])(implicit bf: CanBuildFrom[Array[A], B, Array[B]])
-      : StackFrame[Array[B]] = {
-      val builder = bf(a)
+  implicit class RichArray[A: ClassTag](private val a: Array[A]) {
+    def mapRecur[B: ClassTag](f: A => StackFrame[B]): StackFrame[Array[B]] = {
+      val builder = Array.newBuilder[B]
       builder.sizeHint(a)
       var i = 0
       var cont: B => StackFrame[Array[B]] = null
@@ -148,9 +147,9 @@ object StackSafe {
     }
   }
 
-  implicit class RichIteratorStackFrame[A](private val i: Iterator[StackFrame[A]]) extends AnyVal {
-    def collectRecur(implicit bf: CanBuild[A, Array[A]]): StackFrame[IndexedSeq[A]] = {
-      val builder = bf()
+  implicit class RichIteratorStackFrame[A: ClassTag](private val i: Iterator[StackFrame[A]]) {
+    def collectRecur: StackFrame[IndexedSeq[A]] = {
+      val builder = IndexedSeq.newBuilder[A]
       var cont: A => StackFrame[IndexedSeq[A]] = null
       def loop(): StackFrame[IndexedSeq[A]] =
         if (i.hasNext) {
@@ -166,9 +165,8 @@ object StackSafe {
     }
   }
 
-  def fillArray[A](n: Int)(body: => StackFrame[A])(implicit bf: CanBuild[A, Array[A]])
-    : StackFrame[Array[A]] = {
-    val builder = bf()
+  def fillArray[A: ClassTag](n: Int)(body: => StackFrame[A]): StackFrame[Array[A]] = {
+    val builder = Array.newBuilder[A]
     builder.sizeHint(n)
     var i = 0
     var cont: A => StackFrame[Array[A]] = null

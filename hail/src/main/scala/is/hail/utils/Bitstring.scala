@@ -1,11 +1,12 @@
 package is.hail.utils
 
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 object Bitstring {
   def apply(string: String): Bitstring = {
     assert(string.forall(c => c == '0' || c == '1'))
-    val bitstring = mutable.ArrayBuilder.make[Long]()
+    val bitstring = mutable.ArrayBuilder.make[Long](ClassTag.Long)
     var pos: Int = 0
     while (string.length - pos > 64) {
       bitstring += java.lang.Long.parseUnsignedLong(string.slice(pos, pos + 64), 2)

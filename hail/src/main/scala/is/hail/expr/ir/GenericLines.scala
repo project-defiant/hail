@@ -401,7 +401,7 @@ object GenericLines {
 
   def collect(fs: FS, lines: GenericLines): IndexedSeq[String] =
     lines.contexts.flatMap { context =>
-      using(lines.body(fs, context))(it => it.map(_.toString).toArray)
+      using(lines.body(fs, context))(it => it.map(_.toString).toIndexedSeq)
     }
 }
 

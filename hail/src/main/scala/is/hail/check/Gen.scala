@@ -3,9 +3,7 @@ package is.hail.check
 import is.hail.check.Arbitrary.arbitrary
 import is.hail.utils.roundWithConstantSum
 
-import scala.collection.generic.CanBuildFrom
-import scala.collection.mutable
-import scala.language.higherKinds
+import scala.collection.{Factory, mutable}
 import scala.math.Numeric.Implicits._
 import scala.reflect.ClassTag
 
@@ -220,12 +218,12 @@ object Gen {
     sampleBetaBinomial(p.rng, n, alpha, beta)
   }
 
-  def shuffle[T](is: IndexedSeq[T]): Gen[IndexedSeq[T]] = {
+  def shuffle[T: ClassTag](is: IndexedSeq[T]): Gen[IndexedSeq[T]] = {
     Gen { (p: Parameters) =>
       if (is.isEmpty)
         is
       else
-        p.rng.nextPermutation(is.size, is.size).map(is)
+        p.rng.nextPermutation(is.size, is.size).map(is(_))
     }
   }
 
@@ -263,10 +261,9 @@ object Gen {
     )
   }
 
-  def sequence[C[_], T](gs: Traversable[Gen[T]])(implicit cbf: CanBuildFrom[Nothing, T, C[T]])
-    : Gen[C[T]] =
+  def sequence[T, C](gs: Traversable[Gen[T]])(implicit factory: Factory[T, C]): Gen[C] =
     Gen { (p: Parameters) =>
-      val b = cbf()
+      val b = factory.newBuilder
       gs.foreach(g => b += g(p))
       b.result()
     }
@@ -298,20 +295,17 @@ object Gen {
     * With {@code Gen} we must also consider the distribution of size. {@code uniformSequence}
     * distributes the size uniformly across all elements of the traversable.
     */
-  def uniformSequence[C[_], T](
-    gs: Traversable[Gen[T]]
-  )(implicit cbf: CanBuildFrom[Nothing, T, C[T]]
-  ): Gen[C[T]] =
-    partitionSize(gs.size).map(resizeMany(gs, _)).flatMap(sequence[C, T])
+  def uniformSequence[T, C](gs: Traversable[Gen[T]])(implicit factory: Factory[T, C]): Gen[C] =
+    partitionSize(gs.size).map(resizeMany(gs, _)).flatMap(sequence[T, C])
 
   private def resizeMany[T](gs: Traversable[Gen[T]], partition: Array[Int]): Iterable[Gen[T]] =
-    (gs.toIterable, partition).zipped.map((gen, size) => gen.resize(size))
+    gs.toIterable.lazyZip(partition).map((gen, size) => gen.resize(size))
 
-  def stringOf[T](g: Gen[T])(implicit cbf: CanBuildFrom[Nothing, T, String]): Gen[String] =
+  def stringOf[T](g: Gen[T])(implicit factory: Factory[T, String]): Gen[String] =
     unsafeBuildableOf(g)
 
   sealed trait BuildableOf[C[_]] {
-    def apply[T](g: Gen[T])(implicit cbf: CanBuildFrom[Nothing, T, C[T]]): Gen[C[T]] =
+    def apply[T](g: Gen[T])(implicit factory: Factory[T, C[T]]): Gen[C[T]] =
       unsafeBuildableOf(g)
   }
 
@@ -321,13 +315,12 @@ object Gen {
 
   implicit def buildableOfFromElements[C[_], T](
     implicit g: Gen[T],
-    cbf: CanBuildFrom[Nothing, T, C[T]],
+    factory: Factory[T, C[T]],
   ): Gen[C[T]] =
     buildableOf[C](g)
 
   sealed trait BuildableOf2[C[_, _]] {
-    def apply[T, U](g: Gen[(T, U)])(implicit cbf: CanBuildFrom[Nothing, (T, U), C[T, U]])
-      : Gen[C[T, U]] =
+    def apply[T, U](g: Gen[(T, U)])(implicit factory: Factory[(T, U), C[T, U]]): Gen[C[T, U]] =
       unsafeBuildableOf(g)
   }
 
@@ -338,10 +331,9 @@ object Gen {
   private val buildableOfAlpha = 3
   private val buildableOfBeta = 6
 
-  private def unsafeBuildableOf[C, T](g: Gen[T])(implicit cbf: CanBuildFrom[Nothing, T, C])
-    : Gen[C] =
+  private def unsafeBuildableOf[C, T](g: Gen[T])(implicit factory: Factory[T, C]): Gen[C] =
     Gen { (p: Parameters) =>
-      val b = cbf()
+      val b = factory.newBuilder
       if (p.size == 0)
         b.result()
       else {
@@ -361,9 +353,9 @@ object Gen {
     }
 
   sealed trait DistinctBuildableOf[C[_]] {
-    def apply[T](g: Gen[T])(implicit cbf: CanBuildFrom[Nothing, T, C[T]]): Gen[C[T]] =
+    def apply[T](g: Gen[T])(implicit factory: Factory[T, C[T]]): Gen[C[T]] =
       Gen { (p: Parameters) =>
-        val b = cbf()
+        val b = factory.newBuilder
         if (p.size == 0)
           b.result()
         else {
@@ -393,9 +385,9 @@ object Gen {
     * {@code min} distinct elements in finite time.
     */
   sealed trait DistinctBuildableOfAtLeast[C[_]] {
-    def apply[T](min: Int, g: Gen[T])(implicit cbf: CanBuildFrom[Nothing, T, C[T]]): Gen[C[T]] = {
+    def apply[T](min: Int, g: Gen[T])(implicit factory: Factory[T, C[T]]): Gen[C[T]] = {
       Gen { (p: Parameters) =>
-        val b = cbf()
+        val b = factory.newBuilder
         if (p.size < min) {
           throw new RuntimeException(
             s"Size (${p.size}) is too small for buildable of size at least $min"
@@ -432,10 +424,10 @@ object Gen {
     distinctBuildableOfAtLeastInstance.asInstanceOf[DistinctBuildableOfAtLeast[C]]
 
   sealed trait BuildableOfN[C[_]] {
-    def apply[T](n: Int, g: Gen[T])(implicit cbf: CanBuildFrom[Nothing, T, C[T]]): Gen[C[T]] =
+    def apply[T](n: Int, g: Gen[T])(implicit factory: Factory[T, C[T]]): Gen[C[T]] =
       Gen { (p: Parameters) =>
         val part = partitionDirichlet(p.rng, p.size, n)
-        val b = cbf()
+        val b = factory.newBuilder
         for (i <- 0 until n)
           b += g(p.copy(size = part(i)))
         b.result()
@@ -447,7 +439,7 @@ object Gen {
   def buildableOfN[C[_]] = buildableOfNInstance.asInstanceOf[BuildableOfN[C]]
 
   sealed trait DistinctBuildableOfN[C[_]] {
-    def apply[T](n: Int, g: Gen[T])(implicit cbf: CanBuildFrom[Nothing, T, C[T]]): Gen[C[T]] =
+    def apply[T](n: Int, g: Gen[T])(implicit factory: Factory[T, C[T]]): Gen[C[T]] =
       Gen { (p: Parameters) =>
         val part = partitionDirichlet(p.rng, p.size, n)
         val t: mutable.Set[T] = mutable.Set.empty[T]
@@ -456,7 +448,7 @@ object Gen {
           t += g(p.copy(size = part(i)))
           i = t.size
         }
-        val b = cbf()
+        val b = factory.newBuilder
         b ++= t
         b.result()
       }

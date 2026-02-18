@@ -142,7 +142,7 @@ trait CodeBuilderLike {
     val Ldefault = CodeLabel()
 
     append(discriminant.switch(Ldefault, Lcases))
-    (Lcases, cases).zipped.foreach { case (label, emitCase) =>
+    Lcases.lazyZip(cases).foreach { case (label, emitCase) =>
       define(label)
       emitCase()
       if (isOpenEnded) append(Lexit.goto)

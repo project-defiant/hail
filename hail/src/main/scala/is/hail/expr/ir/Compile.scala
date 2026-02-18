@@ -320,25 +320,36 @@ object CompileIterator {
   ) = {
     assert(typ0.required)
     assert(streamElementType.required)
-    val (eltPType, makeStepper) = compileStepper[TMPStepFunction](
-      ctx,
-      ir,
-      Array[ParamType](
-        CodeParamType(typeInfo[Object]),
-        SingleCodeEmitParamType(true, PTypeReferenceSingleCodeType(typ0)),
-        SingleCodeEmitParamType(true, StreamSingleCodeType(true, streamElementType, true)),
-      ),
-      None,
-    )
+    val (eltPType, makeStepper)
+      : (PType, (HailClassLoader, FS, HailTaskContext, Region) => TMPStepFunction) =
+      compileStepper[TMPStepFunction](
+        ctx,
+        ir,
+        Array[ParamType](
+          CodeParamType(typeInfo[Object]),
+          SingleCodeEmitParamType(true, PTypeReferenceSingleCodeType(typ0)),
+          SingleCodeEmitParamType(true, StreamSingleCodeType(true, streamElementType, true)),
+        ),
+        None,
+      )
     (
       eltPType,
-      (theHailClassLoader, fs, htc, consumerCtx, v0, part) => {
-        val stepper = makeStepper(theHailClassLoader, fs, htc, consumerCtx.partitionRegion)
+      (
+        theHailClassLoader: HailClassLoader,
+        fs: FS,
+        htc: HailTaskContext,
+        consumerCtx: RVDContext,
+        v0: Long,
+        part: NoBoxLongIterator,
+      ) => {
+        val stepper: TMPStepFunction =
+          makeStepper(theHailClassLoader, fs, htc, consumerCtx.partitionRegion)
         stepper.setRegions(consumerCtx.partitionRegion, consumerCtx.region)
+        val stepFunc: StepFunctionBase = stepper
+        val tmpStepper = stepper
         new LongIteratorWrapper {
-          val stepFunction: TMPStepFunction = stepper
-
-          def step(): Boolean = stepper.apply(null, v0, part)
+          protected val stepFunction: StepFunctionBase = stepFunc
+          def step(): Boolean = tmpStepper.apply(null, v0, part)
         }
       },
     )
@@ -355,25 +366,36 @@ object CompileIterator {
   ) = {
     assert(ctxType.required)
     assert(bcValsType.required)
-    val (eltPType, makeStepper) = compileStepper[TableStageToRVDStepFunction](
-      ctx,
-      ir,
-      Array[ParamType](
-        CodeParamType(typeInfo[Object]),
-        SingleCodeEmitParamType(true, PTypeReferenceSingleCodeType(ctxType)),
-        SingleCodeEmitParamType(true, PTypeReferenceSingleCodeType(bcValsType)),
-      ),
-      None,
-    )
+    val (eltPType, makeStepper)
+      : (PType, (HailClassLoader, FS, HailTaskContext, Region) => TableStageToRVDStepFunction) =
+      compileStepper[TableStageToRVDStepFunction](
+        ctx,
+        ir,
+        Array[ParamType](
+          CodeParamType(typeInfo[Object]),
+          SingleCodeEmitParamType(true, PTypeReferenceSingleCodeType(ctxType)),
+          SingleCodeEmitParamType(true, PTypeReferenceSingleCodeType(bcValsType)),
+        ),
+        None,
+      )
     (
       eltPType,
-      (theHailClassLoader, fs, htc, consumerCtx, v0, v1) => {
-        val stepper = makeStepper(theHailClassLoader, fs, htc, consumerCtx.partitionRegion)
+      (
+        theHailClassLoader: HailClassLoader,
+        fs: FS,
+        htc: HailTaskContext,
+        consumerCtx: RVDContext,
+        v0: Long,
+        v1: Long,
+      ) => {
+        val stepper: TableStageToRVDStepFunction =
+          makeStepper(theHailClassLoader, fs, htc, consumerCtx.partitionRegion)
         stepper.setRegions(consumerCtx.partitionRegion, consumerCtx.region)
+        val stepFunc: StepFunctionBase = stepper
+        val tableStepper = stepper
         new LongIteratorWrapper {
-          val stepFunction: TableStageToRVDStepFunction = stepper
-
-          def step(): Boolean = stepper.apply(null, v0, v1)
+          protected val stepFunction: StepFunctionBase = stepFunc
+          def step(): Boolean = tableStepper.apply(null, v0, v1)
         }
       },
     )

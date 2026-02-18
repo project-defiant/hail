@@ -58,7 +58,7 @@ class JSONLogLayout extends Layout {
       def accept(key: Any, value: Any): Unit =
         mdcFields += JField(key.toString, JString(value.toString))
     })
-    fields += JField("mdc", JObject(mdcFields: _*))
+    fields += JField("mdc", JObject(mdcFields.toSeq: _*))
 
     fields += JField("ndc", JString(ndc))
     fields += JField("severity", JString(event.getLevel().toString()))
@@ -75,7 +75,7 @@ class JSONLogLayout extends Layout {
         JString(formatException(throwableInfo.getThrowable())),
       )
     }
-    val jsonEvent = JObject(fields: _*)
+    val jsonEvent = JObject(fields.toSeq: _*)
 
     val sw = new StringWriter()
     JsonMethods.mapper.writeValue(sw, jsonEvent)

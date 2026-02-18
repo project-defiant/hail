@@ -7,8 +7,8 @@ import is.hail.types.virtual._
 import is.hail.utils.{Interval, IntervalEndpoint, _}
 import is.hail.variant.{Locus, ReferenceGenome}
 
-import scala.Option.option2Iterable
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 import org.apache.spark.sql.Row
 
@@ -172,7 +172,7 @@ class KeySetLattice(ctx: ExecuteContext, keyType: TStruct) extends Lattice {
   def complement(v: Value): Value = {
     if (v.isEmpty) return top
 
-    val builder = mutable.ArrayBuilder.make[Interval]()
+    val builder = mutable.ArrayBuilder.make[Interval](ClassTag(classOf[Interval]))
     if (v.head.left != IntervalEndpoint(Row(), -1)) {
       builder += Interval(IntervalEndpoint(Row(), -1), v.head.left)
     }

@@ -7,7 +7,7 @@ import org.apache.spark.util._
 
 object ExposedUtils {
   def clean[F <: AnyRef](f: F, checkSerializable: Boolean = true): F = {
-    ClosureCleaner.clean(f, checkSerializable)
+    ClosureCleaner.clean(f, checkSerializable, scala.collection.mutable.Map.empty)
     f
   }
 

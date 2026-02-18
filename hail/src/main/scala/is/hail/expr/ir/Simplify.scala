@@ -435,7 +435,7 @@ object Simplify {
           bindings.foldLeft(0)((sum, binding) => sum + numBindings(binding))
         )
 
-      newBindings ++= bindings.view.take(i)
+      newBindings ++= bindings.view.take(i).toSeq
 
       bindings.view.drop(i).foreach {
         case Binding(name, ir: Block, scope) =>

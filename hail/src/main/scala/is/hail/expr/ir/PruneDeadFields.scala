@@ -1912,8 +1912,8 @@ object PruneDeadFields {
         val child2 = rebuild(ctx, child, memo)
         TableRename(
           child2,
-          rowMap.filterKeys(child2.typ.rowType.hasField),
-          globalMap.filterKeys(child2.typ.globalType.hasField),
+          rowMap.filterKeys(child2.typ.rowType.hasField).toMap,
+          globalMap.filterKeys(child2.typ.globalType.hasField).toMap,
         )
       case TableUnion(children) =>
         val requestedType = memo.requestedType.lookup(tir).asInstanceOf[TableType]
@@ -2103,10 +2103,10 @@ object PruneDeadFields {
         val child2 = rebuild(ctx, child, memo)
         MatrixRename(
           child2,
-          globalMap.filterKeys(child2.typ.globalType.hasField),
-          colMap.filterKeys(child2.typ.colType.hasField),
-          rowMap.filterKeys(child2.typ.rowType.hasField),
-          entryMap.filterKeys(child2.typ.entryType.hasField),
+          globalMap.filterKeys(child2.typ.globalType.hasField).toMap,
+          colMap.filterKeys(child2.typ.colType.hasField).toMap,
+          rowMap.filterKeys(child2.typ.rowType.hasField).toMap,
+          entryMap.filterKeys(child2.typ.entryType.hasField).toMap,
         )
       case RelationalLetMatrixTable(name, value, body) =>
         val value2 = rebuildIR(ctx, value, BindingEnv.empty, memo)

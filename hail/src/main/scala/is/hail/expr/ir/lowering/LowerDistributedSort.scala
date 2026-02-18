@@ -705,7 +705,7 @@ object LowerDistributedSort {
       }
     }
     if (!currentGroup.isEmpty) {
-      result.append((lastKeySeen.get, currentGroup))
+      result.append((lastKeySeen.get, currentGroup.toIndexedSeq))
     }
     result.result().toIndexedSeq
   }
@@ -769,7 +769,7 @@ object LowerDistributedSort {
           currentPartByteSize,
         ))
       }
-      groupedIntoParts.result()
+      groupedIntoParts.result().toIndexedSeq
     }
   }
 

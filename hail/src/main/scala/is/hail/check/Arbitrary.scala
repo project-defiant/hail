@@ -1,7 +1,6 @@
 package is.hail.check
 
-import scala.collection.generic.CanBuildFrom
-import scala.language.higherKinds
+import scala.collection.Factory
 
 object Arbitrary {
   def apply[T](arbitrary: Gen[T]): Arbitrary[T] =
@@ -80,7 +79,7 @@ object Arbitrary {
 
   implicit def arbBuildableOf[C[_], T](
     implicit a: Arbitrary[T],
-    cbf: CanBuildFrom[Nothing, T, C[T]],
+    factory: Factory[T, C[T]],
   ): Arbitrary[C[T]] =
     Arbitrary(Gen.buildableOf(a.arbitrary))
 

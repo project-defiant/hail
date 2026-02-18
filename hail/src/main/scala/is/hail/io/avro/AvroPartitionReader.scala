@@ -155,7 +155,7 @@ object AvroReader {
     case Schema.Type.STRING => TString
     case Schema.Type.BYTES => TBinary
     case Schema.Type.RECORD =>
-      TStruct(schema.getFields.asScala.map(f => (f.name(), _schemaToType(f.schema()))): _*)
+      TStruct(schema.getFields.asScala.toSeq.map(f => (f.name(), _schemaToType(f.schema()))): _*)
     case Schema.Type.UNION =>
       val types = schema.getTypes
       // we only support ["null", type] (or [type, "null"]) for unions as nullable data

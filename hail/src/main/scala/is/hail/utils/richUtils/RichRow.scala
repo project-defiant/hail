@@ -23,7 +23,7 @@ class RichRow(r: Row) {
     val ab = new mutable.ArrayBuffer[Any]()
     ab ++= r.toSeq
     ab += a
-    Row.fromSeq(ab)
+    Row.fromSeq(ab.toSeq)
   }
 
   def insertBefore(i: Int, a: Any): Row = {
@@ -31,7 +31,7 @@ class RichRow(r: Row) {
     (0 until i).foreach(ab += r.get(_))
     ab += a
     (i until r.size).foreach(ab += r.get(_))
-    Row.fromSeq(ab)
+    Row.fromSeq(ab.toSeq)
   }
 
   def truncate(newSize: Int): Row = {

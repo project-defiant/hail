@@ -282,7 +282,7 @@ class ServiceBackend(
     log.info(s"parallelizeAndComputeWithIndex: $token: reading results")
     val startTime = System.nanoTime()
     var r @ (err, results) = runAllKeepFirstError(new CancellingExecutorService(executor)) {
-      (partIdxs, parts.indices).zipped.map { (partIdx, jobIndex) =>
+      partIdxs.lazyZip(parts.indices).map { (partIdx, jobIndex) =>
         (() => readResult(root, jobIndex), partIdx)
       }
     }

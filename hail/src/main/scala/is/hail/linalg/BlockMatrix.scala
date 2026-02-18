@@ -763,9 +763,9 @@ class BlockMatrix(
   }
 
   // element-wise ops
-  def unary_+(): M = this
+  def unary_+ : M = this
 
-  def unary_-(): M = blockMap(-_, "negation", reqDense = false)
+  def unary_- : M = blockMap(-_, "negation", reqDense = false)
 
   def add(that: M): M =
     if (sameBlocks(that)) {
@@ -2057,13 +2057,13 @@ private class BlockMatrixMultiplyRDD(l: BlockMatrix, r: BlockMatrix)
       new NarrowDependency(l.blocks) {
         def getParents(partitionId: Int): Seq[Int] = {
           val i = gp.blockBlockRow(partitionId)
-          (0 until nProducts).map(k => lGP.coordinatesPart(i, k)).filter(_ >= 0).toArray
+          (0 until nProducts).map(k => lGP.coordinatesPart(i, k)).filter(_ >= 0).toSeq
         }
       },
       new NarrowDependency(r.blocks) {
         def getParents(partitionId: Int): Seq[Int] = {
           val j = gp.blockBlockCol(partitionId)
-          (0 until nProducts).map(k => rGP.coordinatesPart(k, j)).filter(_ >= 0).toArray
+          (0 until nProducts).map(k => rGP.coordinatesPart(k, j)).filter(_ >= 0).toSeq
         }
       },
     )

@@ -309,9 +309,11 @@ case class BatchClient private (req: Requester) extends Logging with AutoCloseab
         ),
       )
       .as { case obj: JObject =>
-        (
-          (obj \ "update_id").extract[Int],
-          (obj \ "start_job_group_id").extract[Int],
+        Right(
+          (
+            (obj \ "update_id").extract[Int],
+            (obj \ "start_job_group_id").extract[Int],
+          )
         )
       }
 

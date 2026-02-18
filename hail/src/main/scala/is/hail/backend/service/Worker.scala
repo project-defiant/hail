@@ -64,7 +64,7 @@ object ExplicitClassLoaderInputStream {
     m.put("long", Long.getClass)
     m.put("float", Float.getClass)
     m.put("double", Double.getClass)
-    m.put("void", Unit.getClass)
+    m.put("void", classOf[Unit])
     m
   }
 }

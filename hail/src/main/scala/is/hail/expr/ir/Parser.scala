@@ -249,7 +249,7 @@ object IRParser {
     new RVDPartitioner(
       env.ctx.stateManager,
       keyType,
-      rangeBounds.asInstanceOf[mutable.IndexedSeq[Interval]],
+      rangeBounds.asInstanceOf[IndexedSeq[Interval]].toIndexedSeq,
     )
   }
 
@@ -877,7 +877,7 @@ object IRParser {
             }
             Binding(name, value, scope)
           }
-          Block(bindings, body)
+          Block(bindings.toIndexedSeq, body)
         }
       case "AggLet" =>
         val n = name(it)
