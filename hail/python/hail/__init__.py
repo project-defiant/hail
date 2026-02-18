@@ -3,8 +3,8 @@ from pathlib import Path
 from sys import version_info
 from typing import Optional
 
-if version_info < (3, 9):
-    raise EnvironmentError(f'Hail requires Python 3.9 or later, found {version_info.major}.{version_info.minor}')
+if version_info < (3, 10):
+    raise EnvironmentError(f'Hail requires Python 3.10 or later, found {version_info.major}.{version_info.minor}')
 
 
 def __resource(name: str) -> Path:

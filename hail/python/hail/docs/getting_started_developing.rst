@@ -6,7 +6,7 @@ Hail is an open-source project. We welcome contributions to the repository.
 Requirements
 ~~~~~~~~~~~~
 
-- `Java 11 JDK <https://adoptopenjdk.net/index.html>`_ . If you have a Mac, you must use a
+- `Java 17 JDK <https://adoptopenjdk.net/index.html>`_ . If you have a Mac, you must use a
   compatible architecture (``uname -m`` prints your architecture).
 
 - The Python and non-pip installation requirements in `Getting Started <getting_started.html>`_.

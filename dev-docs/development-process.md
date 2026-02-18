@@ -25,7 +25,7 @@ easier on the reviewer. It may not always be possible to break up a feature into
 Before you can write code, there are some setup steps that will allow you to
 develop effectively.
 
-Hail currently supports Python version 3.9 or greater.
+Hail currently supports Python version 3.10 or greater.
 
 Install the python dependencies of every Hail sub-project (e.g. ci, batch, hail/python/hailtop):
 
@@ -264,10 +264,10 @@ in Kubernetes, you can run `devbin/sync.py` like the following:
 python3 devbin/sync.py \
     --namespace <my_namespace> \
     --app batch --app batch-driver \
-    --path batch/batch /usr/local/lib/python3.9/dist-packages/ \
-    --path gear/gear /usr/local/lib/python3.9/dist-packages/ \
-    --path web_common/web_common /usr/local/lib/python3.9/dist-packages/ \
-    --path hail/python/hailtop /usr/local/lib/python3.9/dist-packages/
+    --path batch/batch /usr/local/lib/python3.10/dist-packages/ \
+    --path gear/gear /usr/local/lib/python3.10/dist-packages/ \
+    --path web_common/web_common /usr/local/lib/python3.10/dist-packages/ \
+    --path hail/python/hailtop /usr/local/lib/python3.10/dist-packages/
 ```
 
 This will create a long-running process that watches the files in the `batch`

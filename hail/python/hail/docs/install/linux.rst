@@ -2,8 +2,8 @@
 Install Hail on GNU/Linux
 =========================
 
-- Install Java 11.
-- Install Python 3.9 or later.
+- Install Java 17.
+- Install Python 3.10 or later.
 - Install a recent version of the C and C++ standard libraries. GCC 5.0, LLVM
   version 3.4, or any later versions suffice.
 - Install BLAS and LAPACK.
@@ -14,10 +14,10 @@ On a recent Debian-like system, the following should suffice:
 .. code-block:: sh
 
    apt-get install -y \
-       openjdk-11-jre-headless \
+       openjdk-17-jre-headless \
        g++ \
-       python3.9 python3-pip \
+       python3.10 python3-pip \
        libopenblas-base liblapack3
-   python3.9 -m pip install hail
+   python3.10 -m pip install hail
 
 `Now let's take Hail for a spin! <try.rst>`__

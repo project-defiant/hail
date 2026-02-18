@@ -140,7 +140,7 @@ object `package` extends RootModule with HailScalaModule { outer =>
     }
 
     def sparkVersion: T[String] = Task.Input {
-      Result.Success(T.ctx().env.getOrElse("SPARK_VERSION", "3.5.0"))
+      Result.Success(T.ctx().env.getOrElse("SPARK_VERSION", "4.1.0"))
     }
 
     def debugMode: T[Boolean] = Task.Input {
